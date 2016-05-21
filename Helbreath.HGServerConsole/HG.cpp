@@ -6025,6 +6025,11 @@ void CGame::ChatMsgHandler(int iClientH, char * pData, DWORD dwMsgSize)
 			AdminOrder_Revive(iClientH, cp, dwMsgSize - 21);
 			return;
 		}
+		else if (memcmp(cp, "/killall", 7) == 0) {
+			AdminCommandsHandler *adminCommandsHandler = new AdminCommandsHandler();
+			//adminCommandsHandler->KillAllMonsters(iClientH, m_pClientList[iClientH], m_pMapList);
+			return;
+		}
 		else if (memcmp(cp, "/mcount", 8) == 0) {
 			Apocalypse_MonsterCount(iClientH);
 		} else if (memcmp(cp, "/send ", 5) == 0) {

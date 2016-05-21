@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdminCommandsHandler.cpp" />
     <ClCompile Include="Astoria.cpp" />
     <ClCompile Include="cApplicationStartup.cpp" />
     <ClCompile Include="char\Client.cpp" />
@@ -118,6 +119,7 @@
     <ClCompile Include="ui\Wmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdminCommandsHandler.h" />
     <ClInclude Include="Astoria.h" />
     <ClInclude Include="cApplicationStartup.h" />
     <ClInclude Include="char\ActionID.h" />
