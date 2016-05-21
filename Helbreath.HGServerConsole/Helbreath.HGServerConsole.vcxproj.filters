@@ -132,6 +132,9 @@
     <ClCompile Include="AdminCommandsHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NpcKilledHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApplicationStartup.h">
@@ -264,6 +267,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AdminCommandsHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NpcKilledHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
