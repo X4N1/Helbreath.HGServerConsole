@@ -712,6 +712,7 @@ public:
 		int *iItemIDs, POINT *BasePos, int *iNumItem);
 	void _AdjustRareItemValue(class CItem * pItem);
 	char CheckHeroItemEquipped(int iClientH);
+	void CreateDKItem(int iClientH, char *cItemName);
 
 	CGame(HWND hWnd);
 	~CGame();

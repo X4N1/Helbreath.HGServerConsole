@@ -37332,72 +37332,81 @@ void CGame::GetAngelHandler(int iClientH, char * pData, DWORD dwMsgSize)
 void CGame::GetDKItemHandler(int iClientH, char * pData, DWORD dwMsgSize)
 {
 	char  *cp, cTmpName[21];
-	int   iAngel;
-	int   iEraseReq;
+	int   setType;	
 	char  cItemName[21];
 	int   * ip;
-	if (m_pClientList[iClientH] == NULL) return;
-	if (m_pClientList[iClientH]->m_bIsInitComplete == FALSE) return;
-	if (_iGetItemSpaceLeft(iClientH) == 0) 
-	{
+
+	if (m_pClientList[iClientH] == NULL) {
+		return;
+	}
+	if (m_pClientList[iClientH]->m_bIsInitComplete == FALSE) {
+		return;
+	}
+
+	if (_iGetItemSpaceLeft(iClientH) == 0){
 		SendItemNotifyMsg(iClientH, NOTIFY_CANNOTCARRYMOREITEM, NULL, NULL, false);
 		return;
 	}
+
 	cp = (char *)(pData + INDEX2_MSGTYPE + 2);
 	ZeroMemory(cTmpName, sizeof(cTmpName));
 	strcpy(cTmpName, cp);
 	cp += 20;
 	ip = (int *)cp;
-	iAngel = (int) *ip;
+	setType = (int) *ip;
 	cp += 2;
-	switch (iAngel) 
+
+	switch (setType)
 	{
 	case 10:
 		wsprintf(cItemName, "DMMagicStaff");
+		CreateDKItem(iClientH, cItemName);
 		break;
 	case 11:
 		wsprintf(cItemName, "DKRapier");
+		CreateDKItem(iClientH, cItemName);
 		break;
-	case 12:
-		wsprintf(cItemName, "DKGreatSword");
-		break;
-	case 13:
-		wsprintf(cItemName, "DKFlameberg");
-		break;
-
 	default:
 		PutLogList("Cityhall officer asked to create a wrong item!");
 		return;
 	}
+}
 
-	if(m_pClientList[iClientH]->HasItem(cItemName) != ITEM_NONE)
+void CGame::CreateDKItem(int iClientH, char *cItemName)
+{
+	int   iEraseReq;
+
+	if (m_pClientList[iClientH]->HasItem(cItemName) != ITEM_NONE) {
 		return;
+	}
 
 	CItem * pItem = new class CItem;
-	if (pItem == NULL) return;
-	if ((_bInitItemAttr(pItem, cItemName) == TRUE)) 
+	if (pItem == NULL) {
+		return;
+	}
+	if ((_bInitItemAttr(pItem, cItemName) == TRUE))
 	{
 		pItem->m_sTouchEffectType = ITET_UNIQUE_OWNER;
 		pItem->m_sTouchEffectValue1 = m_pClientList[iClientH]->m_sCharIDnum1;
 		pItem->m_sTouchEffectValue2 = m_pClientList[iClientH]->m_sCharIDnum2;
 		pItem->m_sTouchEffectValue3 = m_pClientList[iClientH]->m_sCharIDnum3;
-		if (_bAddClientItemList(iClientH, pItem, &iEraseReq) == TRUE) 
+		if (_bAddClientItemList(iClientH, pItem, &iEraseReq) == TRUE)
 		{
 			SendItemNotifyMsg(iClientH, NOTIFY_ITEMOBTAINED, pItem, NULL, true);
 
 			if (iEraseReq == 1) delete pItem;
-			
-			/*	m_pClientList[iClientH]->m_iGizonItemUpgradeLeft -= iRequiredMagesty; 
+
+			/*	m_pClientList[iClientH]->m_iGizonItemUpgradeLeft -= iRequiredMagesty;
 			SendNotifyMsg(NULL, iClientH, NOTIFY_GIZONITEMUPGRADELEFT, m_pClientList[iClientH]->m_iGizonItemUpgradeLeft, NULL, NULL, NULL); */
 		}
-		else 
+		else
 		{
-			m_pMapList[ m_pClientList[iClientH]->m_cMapIndex ]->bSetItem(m_pClientList[iClientH]->m_sX, m_pClientList[iClientH]->m_sY, pItem);
+			m_pMapList[m_pClientList[iClientH]->m_cMapIndex]->bSetItem(m_pClientList[iClientH]->m_sX, m_pClientList[iClientH]->m_sY, pItem);
 			SendEventToNearClient_TypeB(MSGID_EVENT_COMMON, COMMONTYPE_ITEMDROP, m_pClientList[iClientH]->m_cMapIndex, m_pClientList[iClientH]->m_sX, m_pClientList[iClientH]->m_sY, pItem->m_sSprite, pItem->m_sSpriteFrame, pItem->m_cItemColor);
 			SendItemNotifyMsg(iClientH, NOTIFY_CANNOTCARRYMOREITEM, NULL, NULL, true);
 		}
 	}
-	else 
+	else
 	{
 		delete pItem;
 		pItem = NULL;
