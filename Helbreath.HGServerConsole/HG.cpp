@@ -37328,7 +37328,6 @@ void CGame::GetAngelHandler(int iClientH, char * pData, DWORD dwMsgSize)
 	} 
 } 
 
-// Jehovah - Coded a DK item handler for cityhall from snoopys function.
 void CGame::GetDKItemHandler(int iClientH, char * pData, DWORD dwMsgSize)
 {
 	char  *cp, cTmpName[21];
@@ -37356,19 +37355,43 @@ void CGame::GetDKItemHandler(int iClientH, char * pData, DWORD dwMsgSize)
 	setType = (int) *ip;
 	cp += 2;
 
+	//mag and warrior, should choose depend on player sex
+
 	switch (setType)
 	{
 	case 10:
 		wsprintf(cItemName, "DMMagicStaff");
-		CreateDKItem(iClientH, cItemName);
+		RequestForMageDKSet(iClientH);
 		break;
 	case 11:
 		wsprintf(cItemName, "DKRapier");
-		CreateDKItem(iClientH, cItemName);
+		RequestForWarriorDKSet(iClientH);
 		break;
 	default:
 		PutLogList("Cityhall officer asked to create a wrong item!");
 		return;
+	}
+}
+
+void CGame::RequestForWarriorDKSet(int iClientH)
+{
+	int playerSex = 1;
+	if (playerSex == 1) {
+		// give male warrior set
+	}
+	else {
+		// give female warrior set
+	}
+}
+
+void CGame::RequestForMageDKSet(int iClientH) {
+	
+	int playerSex = 1;
+	if (playerSex == 1) {
+		//give male mage set
+	}
+	else {
+		// give female mage set
 	}
 }
 
