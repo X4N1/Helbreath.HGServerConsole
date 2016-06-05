@@ -37375,23 +37375,40 @@ void CGame::GetDKItemHandler(int iClientH, char * pData, DWORD dwMsgSize)
 
 void CGame::RequestForWarriorDKSet(int iClientH)
 {
-	int playerSex = 1;
+	int DKWarriorSetMale[20] = { 1,2,3 };
+	int DKWarriorSetFemale[20] = { 1,2,3 };
+
+	int playerSex = m_pClientList[iClientH]->m_cSex;
 	if (playerSex == 1) {
-		// give male warrior set
+		for (int i = 0; i < 20; i++)
+		{
+			CreateDKItem(iClientH, "a");
+		}
 	}
-	else {
-		// give female warrior set
+	else if (playerSex == 2) {
+		for (int i = 0; i < 20; i++)
+		{
+			CreateDKItem(iClientH, "a");
+		}
 	}
 }
 
 void CGame::RequestForMageDKSet(int iClientH) {
-	
-	int playerSex = 1;
+	int DKMageSetMale[20] = { 1,2,3 };
+	int DKMageSetFemale[20] = { 1,2,3 };
+
+	int playerSex = m_pClientList[iClientH]->m_cSex;
 	if (playerSex == 1) {
-		//give male mage set
+		for (int i = 0; i < 20; i++)
+		{
+			CreateDKItem(iClientH, "a");
+		}
 	}
-	else {
-		// give female mage set
+	else if (playerSex == 2) {
+		for (int i = 0; i < 20; i++)
+		{
+			CreateDKItem(iClientH, "a");
+		}
 	}
 }
 
