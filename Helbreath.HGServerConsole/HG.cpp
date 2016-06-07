@@ -37353,61 +37353,66 @@ void CGame::GetDKItemHandler(int iClientH, char * pData, DWORD dwMsgSize)
 	cp += 20;
 	ip = (int *)cp;
 	setType = (int) *ip;
-	cp += 2;
-
-	//mag and warrior, should choose depend on player sex
+	cp += 2;	
 
 	switch (setType)
 	{
-	case 10:
-		wsprintf(cItemName, "DMMagicStaff");
+	case 10:		
 		RequestForMageDKSet(iClientH);
 		break;
-	case 11:
-		wsprintf(cItemName, "DKRapier");
+	case 11:		
 		RequestForWarriorDKSet(iClientH);
 		break;
 	default:
-		PutLogList("Cityhall officer asked to create a wrong item!");
+		PutLogList("Cityhall officer asked to create a wrong set!");
 		return;
 	}
 }
 
 void CGame::RequestForWarriorDKSet(int iClientH)
 {
-	int DKWarriorSetMale[20] = { 1,2,3 };
-	int DKWarriorSetFemale[20] = { 1,2,3 };
+	std::string logMessage = "Player :";
+	logMessage += m_pClientList[iClientH]->m_cCharName;
+	PutLogList(logMessage + " asked for Warrior DKSet");
+
+	char *DKWarriorSetMale[4] = { "DKFullHelm(M)","DKHauberk(M)","DKPlateMail(M)", "DKLeggings(M)" };
+	char *DKWarriorSetFemale[4] = { "DKFullHelm(W)","DKHauberk(W)","DKPlateMail(W)", "DKLeggings(W)" };
 
 	int playerSex = m_pClientList[iClientH]->m_cSex;
 	if (playerSex == 1) {
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			CreateDKItem(iClientH, "a");
-		}
+			CreateDKItem(iClientH, DKWarriorSetMale[i]);
+		}		
 	}
 	else if (playerSex == 2) {
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			CreateDKItem(iClientH, "a");
+			CreateDKItem(iClientH, DKWarriorSetFemale[i]);
 		}
 	}
 }
 
-void CGame::RequestForMageDKSet(int iClientH) {
-	int DKMageSetMale[20] = { 1,2,3 };
-	int DKMageSetFemale[20] = { 1,2,3 };
+void CGame::RequestForMageDKSet(int iClientH)
+{
+	std::string logMessage = "Player :";
+	logMessage += m_pClientList[iClientH]->m_cCharName;
+	PutLogList(logMessage + " asked for Mage DKSet");
+
+	char *DKMageSetMale[4] = { "DKFullHelm(M)","DKHauberk(M)","DKPlateMail(M)", "DKLeggings(M)" };
+	char *DKMageSetFemale[4] = { "DKFullHelm(W)","DKHauberk(W)","DKPlateMail(W)", "DKLeggings(W)" };
 
 	int playerSex = m_pClientList[iClientH]->m_cSex;
 	if (playerSex == 1) {
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			CreateDKItem(iClientH, "a");
+			CreateDKItem(iClientH, DKMageSetMale[i]);
 		}
 	}
 	else if (playerSex == 2) {
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			CreateDKItem(iClientH, "a");
+			CreateDKItem(iClientH, DKMageSetFemale[i]);
 		}
 	}
 }
