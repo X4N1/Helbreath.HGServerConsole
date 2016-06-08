@@ -37375,18 +37375,18 @@ void CGame::RequestForWarriorDKSet(int iClientH)
 	logMessage += m_pClientList[iClientH]->m_cCharName;
 	PutLogList(logMessage + " asked for Warrior DKSet");
 
-	char *DKWarriorSetMale[4] = { "DKFullHelm(M)","DKHauberk(M)","DKPlateMail(M)", "DKLeggings(M)" };
-	char *DKWarriorSetFemale[4] = { "DKFullHelm(W)","DKHauberk(W)","DKPlateMail(W)", "DKLeggings(W)" };
+	char *DKWarriorSetMale[5] = { "DarkKnightHauberk(M)","DarkKnightFullHelm(M)","DarkKnightLeggings(M)", "DarkKnightPlateMail(M)", "DarkKnightFlameberge" };
+	char *DKWarriorSetFemale[5] = { "DarkKnightHauberk(W)","DarkKnightFullHelm(W)","DarkKnightLeggings(W)", "DarkKnightPlateMail(W)", "DarkKnightFlameberge" };
 
 	int playerSex = m_pClientList[iClientH]->m_cSex;
 	if (playerSex == 1) {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			CreateDKItem(iClientH, DKWarriorSetMale[i]);
 		}		
 	}
 	else if (playerSex == 2) {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			CreateDKItem(iClientH, DKWarriorSetFemale[i]);
 		}
@@ -37399,18 +37399,18 @@ void CGame::RequestForMageDKSet(int iClientH)
 	logMessage += m_pClientList[iClientH]->m_cCharName;
 	PutLogList(logMessage + " asked for Mage DKSet");
 
-	char *DKMageSetMale[4] = { "DKFullHelm(M)","DKHauberk(M)","DKPlateMail(M)", "DKLeggings(M)" };
-	char *DKMageSetFemale[4] = { "DKFullHelm(W)","DKHauberk(W)","DKPlateMail(W)", "DKLeggings(W)" };
+	char *DKMageSetMale[5] = { "DarkMageHauberk(M)","DarkMageChainMail(M)","DarkMageLeggings(M)", "DarkMageHat(M)", "DarkMageMagicStaff" };
+	char *DKMageSetFemale[5] = { "DarkMageHauberk(W)","DarkMageChainMail(W)","DarkMageLeggings(W)", "DarkMageHat(W)", "DarkMageMagicStaff" };
 
 	int playerSex = m_pClientList[iClientH]->m_cSex;
 	if (playerSex == 1) {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			CreateDKItem(iClientH, DKMageSetMale[i]);
 		}
 	}
 	else if (playerSex == 2) {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			CreateDKItem(iClientH, DKMageSetFemale[i]);
 		}
