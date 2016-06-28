@@ -68,7 +68,7 @@
 #define MAXMAPS				120
 #define MAXBUILDITEMS		300
 #define CLIENTTIMEOUT		18 _s
-#define AUTOSAVETIME		3 _m
+#define AUTOSAVETIME		2 _m
 #define HPUPTIME			15 _s
 #define MPUPTIME			20 _s
 #define SPUPTIME			10 _s
@@ -633,6 +633,7 @@ public:
 	void RequestInitDataHandler(int iClientH);
 	void RequestInitPlayerHandler(int iClientH, char * pData, char cKey);
 	void PlayerMapEntry(int iClientH, bool setRecallTime = true);
+	void CheckDenialServiceAttack(int iClientH, DWORD dwClientTime);
 
 
 	bool bSendMsgToLS(DWORD dwMsg, int iClientH, bool bFlag = TRUE,char * pData = NULL );
