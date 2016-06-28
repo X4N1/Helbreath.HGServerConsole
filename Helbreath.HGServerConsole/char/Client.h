@@ -18,6 +18,7 @@
 #include "GuildsMan.h"
 #include "Magic.h"
 #include "..\GlobalDef.h"
+#include "..\PartyInfo.h"
 
 #define CLIENTSOCKETBLOCKLIMIT	15
 
@@ -90,8 +91,8 @@ public:
 	bool IsInFoeMap();
 	bool IsInJail();
 	void DecPKCount();
-	void IncPKCount();
-
+	void IncPKCount();	
+	void GetExp(int iExp, bool bIsAttackerOwn, const PartyInfo &partyInfo);
 	float GetDropFactor() const;
 
 	bool IsGM()				{ return (m_iAdminUserLevel == 0)			? FALSE : TRUE; }
@@ -402,6 +403,8 @@ public:
 private:
 	int _str, _int, _dex, _mag, _vit;
 	int _angelStr, _angelInt, _angelDex, _angelMag, _angelVit;
+	int GetExperianceWhenInParty();
+	int GetExperianceWhenNotInParty();
 };
 
 #endif // !defined(AFX_CLIENT_H__39CC7700_789F_11D2_A8E6_00001C7030A6__INCLUDED_)

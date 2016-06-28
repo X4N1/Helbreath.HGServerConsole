@@ -341,6 +341,7 @@ int CClient::GetMagicResistRatio() {
 	ret += m_iAddResistMagic;
 	return ret;
 }
+
 void CClient::SetStr(int str, bool check) 
 {
 	_str = str;
@@ -386,9 +387,11 @@ void CClient::SetDex(int dex)
 {
 	_dex = dex;
 }
+
 void CClient::SetVit(int vit) { 
 	_vit = vit; 
 }
+
 void CClient::SetAngelStr(int str)
 {
 	_angelStr = str;
@@ -412,10 +415,12 @@ void CClient::SetAngelStr(int str)
 				g_gameCopy->ReleaseItemHandler(m_handle, sItemIndex, TRUE);
 		}*/
 }
+
 void CClient::SetAngelDex(int dex)
 {
 	_angelDex = dex;
 }
+
 void CClient::SetAngelInt(int __int)
 {
 	_angelInt = __int;
@@ -425,6 +430,7 @@ void CClient::SetAngelInt(int __int)
 		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
 	}
 }
+
 void CClient::SetAngelMag(int mag)
 {
 	_angelMag = mag ;
@@ -452,7 +458,6 @@ bool CClient::bCreateNewParty()
 
 	return TRUE;
 }
-
 
 bool CClient::CheckTotalSkillMasteryPoints(int iSkill)
 {
@@ -667,6 +672,7 @@ int CClient::GetPlayerRelationship(int iOpponentH) const
 
 	return iRet;
 }
+
 int CClient::GetMaxHP() const
 {
 	int iRet;
@@ -704,9 +710,11 @@ void CClient::AddHP(long hp)
 	if (m_iHP > maxHP) m_iHP = maxHP;
 	g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_HP, NULL, NULL, NULL, NULL);
 }
+
 int CClient::GetPoisonResistRatio() {
 	return m_cSkillMastery[SKILL_POISONRES] + m_iAddPR;
 }
+
 int CClient::GetFrostResistRatio() {
 	// Warm potion
 	if(m_dwWarmEffectTime && (timeGetTime() - m_dwWarmEffectTime) < 1000*30) {
@@ -718,6 +726,7 @@ int CClient::GetFrostResistRatio() {
 	}
 	return m_iAddAbsWater*2; 	
 }
+
 void CClient::WeaponSkillUp(short sWeaponIndex, int iValue) {
 
 	if (!m_bIsInitComplete) return;
@@ -728,11 +737,13 @@ void CClient::WeaponSkillUp(short sWeaponIndex, int iValue) {
 
 	SkillUp(sSkillIndex,iValue);
 }
+
 int CClient::GetSSNToSkillUp(skillIndexes skillindex) {
 	int currentSSN = m_iSkillSSN[skillindex];
 	int nextSSN = g_skillSSNpoint[ m_cSkillMastery[skillindex]+1 ];
 	return nextSSN-currentSSN;
 }
+
 bool CClient::CanSkillUp(skillIndexes skillindex) {
 	int currentskill = m_cSkillMastery[skillindex];
 	currentskill++;
@@ -794,6 +805,7 @@ bool CClient::CanSkillUp(skillIndexes skillindex) {
 	}
 	return true;
 }
+
 void CClient::SkillUp(skillIndexes skillindex, int skillups) {
 	int   iWeaponIndex;
 
@@ -833,6 +845,7 @@ void CClient::SkillUp(skillIndexes skillindex, int skillups) {
 		m_iSkillSSN[skillindex]+=skillups*multiplier;
 	}
 }
+
 void CClient::KilledHandler(int iAttackerH, char cAttackerType, short sDamage)
 {
 	char  * cp, cAttackerName[21], cData[120];
@@ -1090,7 +1103,6 @@ void CClient::ApplyCombatKilledPenalty(char cPenaltyLevel, bool bIsSAattacked, b
 	}
 }
 
-
 void CClient::PenaltyItemDrop(int iTotal, bool bIsSAattacked , bool bItemDrop)
 {
 	register int i, j, iRemainItem;
@@ -1344,6 +1356,7 @@ float CClient::GetDropFactor() const
 	if(IsHeldWinner()) factor *= 0.75;
 	return factor;
 }
+
  bool CClient::IsHeldWinner() const
 {
 	switch(g_gameCopy->m_iLastHeldenianType)
@@ -1356,6 +1369,7 @@ float CClient::GetDropFactor() const
 	}
 	return FALSE;
 }
+
  bool CClient::IsHeldLoser() const
 {
 	switch(g_gameCopy->m_iLastHeldenianType)
@@ -1368,6 +1382,7 @@ float CClient::GetDropFactor() const
 	}
 	return FALSE;
 }
+
 bool CClient::CheckNearbyFlags()
 {
 	if (!g_gameCopy->m_bHeldenianMode || g_gameCopy->m_iHeldenianType != 1 ||
@@ -1389,4 +1404,162 @@ bool CClient::CheckNearbyFlags()
 	}
 
 	return FALSE;
+}
+
+void CClient::GetExp(int iExp, bool bIsAttackerOwn, const PartyInfo &partyInfo) {
+
+	double dV1, dV2, dV3;
+	double tempExp;
+	int i, iH, iUnitValue, iPartyTotalMember = 0, slateMulti = 1;
+	DWORD dwTime = timeGetTime();
+	
+	if (iExp <= 0) {
+		return;
+	}
+
+	if (this->m_iLevel <= 100) {
+		iExp = iExp * 40;
+	}
+	else if (this->m_iLevel > 100 && this->m_iLevel <= 120) {
+		iExp = iExp * 30;
+	}
+	else if (this->m_iLevel > 120 && this->m_iLevel <= 140) {
+		iExp = iExp * 15;
+	}
+	else if (this->m_iLevel > 140 && this->m_iLevel <= 160) {
+		iExp = iExp * 10;
+	}
+	else if (this->m_iLevel > 160 && this->m_iLevel <= 180) {
+		iExp = iExp * 5;
+	}
+
+	if (this->m_iLevel <= 80) {
+		dV1 = (double)(80 - this->m_iLevel);
+		dV2 = dV1 * 0.025f;
+		dV3 = (double)iExp;
+		dV1 = (dV2 + 1.025f)*dV3;
+		iExp = (int)dV1;
+	}
+	else {
+		if ((this->m_iLevel >= 100) && ((strcmp(g_mapList[this->m_cMapIndex]->m_cName, "arefarm") == 0)
+			|| (strcmp(g_mapList[this->m_cMapIndex]->m_cName, "elvfarm") == 0))) {
+			iExp = (iExp / 10);
+		}
+		else if ((strcmp(g_mapList[this->m_cMapIndex]->m_cName, "arefarm") == 0)
+			|| (strcmp(g_mapList[this->m_cMapIndex]->m_cName, "elvfarm") == 0)) {
+			iExp = (iExp * 1 / 4);
+		}
+	}
+
+	if ((this->m_iPartyID != NULL) && (this->m_iPartyStatus == PARTYSTATUS_CONFIRM) &&
+		((dwTime - this->m_dwLastActionTime) < 1000 * 60 * 5)) {
+		if ((iExp >= 10) && (partyInfo.iTotalMembers > 1)) {
+			iPartyTotalMember = 0;
+
+			for (i = 0; i < partyInfo.iTotalMembers; i++) {
+				iH = partyInfo.iIndex[i];
+				if ((g_clientList[iH] != NULL) && (g_clientList[iH]->m_iHP > 0))
+				{
+					iPartyTotalMember++;
+				}
+			}
+			if (iPartyTotalMember > MAXPARTYMEMBERS)
+			{
+				wsprintf(g_cTxt, "(X) Party Bug !! partyMember %d XXXXXXXXXX", iPartyTotalMember);
+				PutLogFileList(g_cTxt);
+				iPartyTotalMember = MAXPARTYMEMBERS;
+			}
+
+			dV1 = (double)iExp;
+
+
+			if (iPartyTotalMember == 1)	dV2 = dV1;
+			else dV2 = (dV1 * ((log((float)(iPartyTotalMember + 2) * 9) / 9) + 0.65)) / iPartyTotalMember;
+
+			/*switch(iPartyTotalMember)
+			{
+			case 1:  dV2 = dV1 ;  break ;
+			case 2:  dV2 = (dV1 + (dV1 * 0.02))  / 2 ; break ;
+			case 3:  dV2 = (dV1 + (dV1 * 0.05)) / 3 ; break ;
+			case 4:  dV2 = (dV1 + (dV1 * 0.07)) / 4 ; break ;
+			case 5:  dV2 = (dV1 + (dV1 * 0.1))  / 5 ; break ;
+			case 6:  dV2 = (dV1 + (dV1 * 0.14)) / 6 ; break ;
+			case 7:  dV2 = (dV1 + (dV1 * 0.17)) / 7 ; break ;
+			case 8:  dV2 = (dV1 + (dV1 * 0.2))  / 8 ; break ;
+			default: dV2 = dV1 ;  break ;
+			}*/
+
+			dV3 = dV2 + 0.5f;
+			iUnitValue = (int)dV3;
+
+			/*
+			dV1 = (double)m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iTotalMembers;
+			dV2 = 2.5f * dV1;
+			dV3 = (double)iExp;
+			dV1 = ((dV2/100.0f) * dV3) +0.5f;
+			iExp += (int)dV1;
+
+			dV1 = (double)iExp;
+			if (m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iTotalMembers <= 0)
+			dV2 = 1.0f;
+			else dV2 = (double)m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iTotalMembers;
+			dV3 = (dV1 / dV2) + 0.5f;
+			iUnitValue = (int)dV3; */
+
+			for (i = 0; i < partyInfo.iTotalMembers; i++, slateMulti = 1) {
+				iH = partyInfo.iIndex[i];
+				if ((g_clientList[iH] != NULL) && (g_clientList[iH]->m_iHP > 0)) {
+					if ((g_clientList[iH]->m_iStatus & STATUS_GREENSLATE) != 0) {
+						slateMulti = 2;
+					}
+					if (g_clientList[iH]->m_iLevel == PLAYERMAXLEVEL) {
+						g_clientList[iH]->m_iExpStock += (iUnitValue / 3) * slateMulti;
+					}
+					else {
+						g_clientList[iH]->m_iExpStock += iUnitValue * slateMulti;
+					}
+				}
+			}
+			if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
+				iUnitValue *= 2;
+			}
+			if (this->m_iLevel == PLAYERMAXLEVEL) {
+				iUnitValue /= 3;
+			}
+			if ((bIsAttackerOwn == TRUE) && (iPartyTotalMember > 1)) {
+				this->m_iExpStock += (int)(iUnitValue / 10);
+			}
+
+		}
+		else
+		{
+			if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
+				iExp *= 2;
+			}
+			if (this->m_iLevel == PLAYERMAXLEVEL) {
+				iExp /= 3;
+			}
+			this->m_iExpStock += iExp;
+		}
+	}
+	else
+	{
+		if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
+			iExp *= 2;
+		}
+		if (this->m_iLevel == PLAYERMAXLEVEL) {
+			iExp /= 3;
+		}
+		this->m_iExpStock += iExp;
+	}
+}
+
+int CClient::GetExperianceWhenInParty()
+{
+	return 0;
+}
+
+int CClient::GetExperianceWhenNotInParty()
+{
+	return 0;
 }

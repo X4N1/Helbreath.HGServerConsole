@@ -31,7 +31,7 @@
 #include "char\unit.h"
 #include "char\Client.h"
 #include "char\npc.h"
-//#include "dropmanager.h"
+
 #include "map\Map.h"
 #include "char\ActionID.h"
 #include "net\UserMessages.h"
@@ -60,6 +60,7 @@
 #include "ClientEventSender.h"
 #include "BossDropConfiguration.h"
 #include "NormalDropConfiguration.h"
+#include "PartyInfo.h"
 
 #define SERVERSOCKETBLOCKLIMIT	300
 
@@ -943,10 +944,7 @@ public:
 	} m_schedules[MAXSCHEDULE];
 
 
-	struct {
-		int iTotalMembers;
-		int iIndex[MAXPARTYMEMBERS];
-	} m_stPartyInfo[MAXPARTYNUM];
+	struct PartyInfo m_stPartyInfo[MAXPARTYNUM];	
 
 	CItem * m_pGold;
 
