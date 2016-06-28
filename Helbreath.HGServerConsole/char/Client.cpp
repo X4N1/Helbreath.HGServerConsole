@@ -27,7 +27,8 @@ CClient::CClient(HWND hWnd, int clientH): Unit(UNITTYPE_PLAYER)
 	m_bIsBeingResurrected = FALSE;
 
 	m_pXSock = NULL;
-
+	clientEventSender = new ClientEventSender();
+	
 	ZeroMemory(m_cProfile, sizeof(m_cProfile));
 	strcpy(m_cProfile, "__________");
 
@@ -341,6 +342,7 @@ int CClient::GetMagicResistRatio() {
 	ret += m_iAddResistMagic;
 	return ret;
 }
+
 void CClient::SetStr(int str, bool check) 
 {
 	_str = str;
@@ -349,12 +351,12 @@ void CClient::SetStr(int str, bool check)
 		if(m_iHP > GetMaxHP())
 		{
 			m_iHP = GetMaxHP();
-			g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_HP, NULL, NULL, NULL, NULL);
+			clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_HP, NULL, NULL, NULL, NULL);
 		}
 		if(m_iSP > GetMaxSP())
 		{
 			m_iSP = GetMaxSP();
-			g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_SP, NULL, NULL, NULL, NULL);
+			clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_SP, NULL, NULL, NULL, NULL);
 		}
 	}
 }
@@ -365,7 +367,7 @@ void CClient::SetMag(int mag)
 	if(m_iMP > GetMaxMP())
 	{
 		m_iMP = GetMaxMP();
-		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
+		clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
 	}
 }
 
@@ -377,7 +379,7 @@ void CClient::SetInt(int __int, bool check)
 		if(m_iMP > GetMaxMP())
 		{
 			m_iMP = GetMaxMP();
-			g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
+			clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
 		}
 	}
 }
@@ -386,9 +388,11 @@ void CClient::SetDex(int dex)
 {
 	_dex = dex;
 }
+
 void CClient::SetVit(int vit) { 
 	_vit = vit; 
 }
+
 void CClient::SetAngelStr(int str)
 {
 	_angelStr = str;
@@ -396,12 +400,12 @@ void CClient::SetAngelStr(int str)
 	if(m_iHP > GetMaxHP())
 	{
 		m_iHP = GetMaxHP();
-		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_HP, NULL, NULL, NULL, NULL);
+		clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_HP, NULL, NULL, NULL, NULL);
 	}
 	if(m_iSP > GetMaxSP())
 	{
 		m_iSP = GetMaxSP();
-		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_SP, NULL, NULL, NULL, NULL);
+		clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_SP, NULL, NULL, NULL, NULL);
 	}
 /*	Done client-side.
 	for (short sItemIndex = 0; sItemIndex < MAXITEMS; sItemIndex++)
@@ -412,26 +416,29 @@ void CClient::SetAngelStr(int str)
 				g_gameCopy->ReleaseItemHandler(m_handle, sItemIndex, TRUE);
 		}*/
 }
+
 void CClient::SetAngelDex(int dex)
 {
 	_angelDex = dex;
 }
+
 void CClient::SetAngelInt(int __int)
 {
 	_angelInt = __int;
 	if(m_iMP > GetMaxMP())
 	{
 		m_iMP = GetMaxMP();
-		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
+		clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
 	}
 }
+
 void CClient::SetAngelMag(int mag)
 {
 	_angelMag = mag ;
 	if(m_iMP > GetMaxMP())
 	{
 		m_iMP = GetMaxMP();
-		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
+		clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_MP, NULL, NULL, NULL, NULL);
 	}
 }
 
@@ -452,7 +459,6 @@ bool CClient::bCreateNewParty()
 
 	return TRUE;
 }
-
 
 bool CClient::CheckTotalSkillMasteryPoints(int iSkill)
 {
@@ -509,7 +515,7 @@ bool CClient::CheckTotalSkillMasteryPoints(int iSkill)
 						if (m_iHitRatio < 0) m_iHitRatio = 0;
 					}
 				}
-				g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_SKILL, sDownSkillIndex, m_cSkillMastery[sDownSkillIndex], NULL, NULL);
+				clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_SKILL, sDownSkillIndex, m_cSkillMastery[sDownSkillIndex], NULL, NULL);
 			}
 			else {
 				return FALSE;
@@ -538,7 +544,7 @@ void CClient::ValidateSkills(bool logInvalidSkills)
 				invalidSkills += m_cSkillMastery[skillIndex] - (GetStr() * 2);
 				m_cSkillMastery[skillIndex] = GetStr() * 2;
 				m_iSkillSSN[skillIndex] = 0;
-				Notify(NULL, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
+				clientEventSender->SendNotificationMessage(NULL, this->m_handle, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
 			}
 			break;
 
@@ -548,7 +554,7 @@ void CClient::ValidateSkills(bool logInvalidSkills)
 				invalidSkills += m_cSkillMastery[skillIndex] - (m_iLevel * 2);
 				m_cSkillMastery[skillIndex] = m_iLevel * 2;
 				m_iSkillSSN[skillIndex] = 0;
-				Notify(NULL, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
+				clientEventSender->SendNotificationMessage(NULL, this->m_handle, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
 			}
 			break;
 
@@ -559,7 +565,7 @@ void CClient::ValidateSkills(bool logInvalidSkills)
 				invalidSkills += m_cSkillMastery[skillIndex] - (GetMag() * 2);
 				m_cSkillMastery[skillIndex] = GetMag() * 2;
 				m_iSkillSSN[skillIndex] = 0;
-				Notify(NULL, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
+				clientEventSender->SendNotificationMessage(NULL, this->m_handle, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
 			}
 			break;
 
@@ -576,7 +582,7 @@ void CClient::ValidateSkills(bool logInvalidSkills)
 				invalidSkills += m_cSkillMastery[skillIndex] - (GetDex() * 2);
 				m_cSkillMastery[skillIndex] = GetDex() * 2;
 				m_iSkillSSN[skillIndex] = 0;
-				Notify(NULL, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
+				clientEventSender->SendNotificationMessage(NULL, this->m_handle, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
 			}
 			break;
 
@@ -588,7 +594,7 @@ void CClient::ValidateSkills(bool logInvalidSkills)
 				invalidSkills += m_cSkillMastery[skillIndex] - (GetInt() * 2);
 				m_cSkillMastery[skillIndex] = GetInt() * 2;
 				m_iSkillSSN[skillIndex] = 0;
-				Notify(NULL, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
+				clientEventSender->SendNotificationMessage(NULL, this->m_handle, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
 			}
 			break;
 
@@ -598,7 +604,7 @@ void CClient::ValidateSkills(bool logInvalidSkills)
 				invalidSkills += m_cSkillMastery[skillIndex] - (GetVit() * 2);
 				m_cSkillMastery[skillIndex] = GetVit() * 2;
 				m_iSkillSSN[skillIndex] = 0;
-				Notify(NULL, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
+				clientEventSender->SendNotificationMessage(NULL, this->m_handle, NOTIFY_SKILL, skillIndex, m_cSkillMastery[skillIndex], NULL, NULL);
 			}
 			break;
 		default:
@@ -667,6 +673,7 @@ int CClient::GetPlayerRelationship(int iOpponentH) const
 
 	return iRet;
 }
+
 int CClient::GetMaxHP() const
 {
 	int iRet;
@@ -702,11 +709,13 @@ void CClient::AddHP(long hp)
 	int maxHP = GetMaxHP();
 	m_iHP += hp; 
 	if (m_iHP > maxHP) m_iHP = maxHP;
-	g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_HP, NULL, NULL, NULL, NULL);
+	clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_HP, NULL, NULL, NULL, NULL);
 }
+
 int CClient::GetPoisonResistRatio() {
 	return m_cSkillMastery[SKILL_POISONRES] + m_iAddPR;
 }
+
 int CClient::GetFrostResistRatio() {
 	// Warm potion
 	if(m_dwWarmEffectTime && (timeGetTime() - m_dwWarmEffectTime) < 1000*30) {
@@ -718,6 +727,7 @@ int CClient::GetFrostResistRatio() {
 	}
 	return m_iAddAbsWater*2; 	
 }
+
 void CClient::WeaponSkillUp(short sWeaponIndex, int iValue) {
 
 	if (!m_bIsInitComplete) return;
@@ -728,11 +738,13 @@ void CClient::WeaponSkillUp(short sWeaponIndex, int iValue) {
 
 	SkillUp(sSkillIndex,iValue);
 }
+
 int CClient::GetSSNToSkillUp(skillIndexes skillindex) {
 	int currentSSN = m_iSkillSSN[skillindex];
 	int nextSSN = g_skillSSNpoint[ m_cSkillMastery[skillindex]+1 ];
 	return nextSSN-currentSSN;
 }
+
 bool CClient::CanSkillUp(skillIndexes skillindex) {
 	int currentskill = m_cSkillMastery[skillindex];
 	currentskill++;
@@ -794,6 +806,7 @@ bool CClient::CanSkillUp(skillIndexes skillindex) {
 	}
 	return true;
 }
+
 void CClient::SkillUp(skillIndexes skillindex, int skillups) {
 	int   iWeaponIndex;
 
@@ -805,34 +818,37 @@ void CClient::SkillUp(skillIndexes skillindex, int skillups) {
 
 	int multiplier = GetSkillMultiplier(skillindex);
 
-	if(m_cSkillMastery[skillindex]>=100) {
+	if (m_cSkillMastery[skillindex] >= 100) {
 		return;
 	}
-	if(skillups*multiplier > GetSSNToSkillUp(skillindex)) { // should skill up
-		if(CanSkillUp(skillindex)) { // if we can skillup, we do
+	if (skillups*multiplier > GetSSNToSkillUp(skillindex)) { // should skill up
+		if (CanSkillUp(skillindex)) { // if we can skillup, we do
 			m_iSkillSSN[skillindex] = 0;
 			m_cSkillMastery[skillindex]++;
-			if (m_sItemEquipmentStatus[ EQUIPPOS_TWOHAND ] != -1) {
-				iWeaponIndex = m_sItemEquipmentStatus[ EQUIPPOS_TWOHAND ];
+			if (m_sItemEquipmentStatus[EQUIPPOS_TWOHAND] != -1) {
+				iWeaponIndex = m_sItemEquipmentStatus[EQUIPPOS_TWOHAND];
 				if (m_pItemList[iWeaponIndex]->m_sRelatedSkill == skillindex) {
 					m_iHitRatio++;
 				}
 			}
-			if (m_sItemEquipmentStatus[ EQUIPPOS_RHAND ] != -1) {
-				iWeaponIndex = m_sItemEquipmentStatus[ EQUIPPOS_RHAND ];
+			if (m_sItemEquipmentStatus[EQUIPPOS_RHAND] != -1) {
+				iWeaponIndex = m_sItemEquipmentStatus[EQUIPPOS_RHAND];
 				if (m_pItemList[iWeaponIndex]->m_sRelatedSkill == skillindex) {
 					m_iHitRatio++;
 				}
 			}
 			CheckTotalSkillMasteryPoints(skillindex);
+
 			// notify of the skillup
-			g_gameCopy->SendNotifyMsg(NULL, this->m_handle, NOTIFY_SKILL, skillindex, m_cSkillMastery[skillindex], NULL, NULL);
+			clientEventSender->SendNotificationMessage(NULL, this->m_handle, NOTIFY_SKILL, skillindex, m_cSkillMastery[skillindex], NULL, NULL);
 			return;
 		} // if not, we ignore it
-	} else { // we get a lil closer to skill up
-		m_iSkillSSN[skillindex]+=skillups*multiplier;
+	}
+	else { // we get a lil closer to skill up
+		m_iSkillSSN[skillindex] += skillups*multiplier;
 	}
 }
+
 void CClient::KilledHandler(int iAttackerH, char cAttackerType, short sDamage)
 {
 	char  * cp, cAttackerName[21], cData[120];
@@ -875,7 +891,7 @@ void CClient::KilledHandler(int iAttackerH, char cAttackerType, short sDamage)
 		break;
 	}
 
-	g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_KILLED, NULL, NULL, NULL, cAttackerName);
+	clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_KILLED, NULL, NULL, NULL, cAttackerName);
 	if (cAttackerType == OWNERTYPE_PLAYER) {
 		sAttackerWeapon = ((g_clientList[iAttackerH]->m_sAppr2 & 0x0FF0) >> 4);
 	}
@@ -1005,7 +1021,7 @@ void CClient::KilledHandler(int iAttackerH, char cAttackerType, short sDamage)
 							//testcode
 							wsprintf(g_cTxt, "Enemy Player Killed by Npc! Construction +%d", (m_iLevel / 2));
 							PutLogList(g_cTxt);
-							g_gameCopy->SendNotifyMsg(NULL, i, NOTIFY_CONSTRUCTIONPOINT, g_clientList[i]->m_iConstructionPoint, g_clientList[i]->m_iWarContribution, NULL, NULL);
+							clientEventSender->SendNotificationMessage(NULL, i, NOTIFY_CONSTRUCTIONPOINT, g_clientList[i]->m_iConstructionPoint, g_clientList[i]->m_iWarContribution, NULL, NULL);
 							return;
 					}
 
@@ -1028,7 +1044,7 @@ void CClient::KilledHandler(int iAttackerH, char cAttackerType, short sDamage)
 		// m_iExp -= dice(1, 50);
 		// if (m_iExp < 0) m_iExp = 0;
 
-		// g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_EXP, NULL, NULL, NULL, NULL);
+		// clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_EXP, NULL, NULL, NULL, NULL);
 	}
 }
 
@@ -1070,7 +1086,7 @@ void CClient::ApplyCombatKilledPenalty(char cPenaltyLevel, bool bIsSAattacked, b
 		m_iExp -= iExp;
 		if (m_iExp < 0) m_iExp = 0;
 
-		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_EXP, NULL, NULL, NULL, NULL);
+		clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_EXP, NULL, NULL, NULL, NULL);
 
 		if (m_bIsNeutral != TRUE) {
 #ifdef ITEMDROP
@@ -1089,7 +1105,6 @@ void CClient::ApplyCombatKilledPenalty(char cPenaltyLevel, bool bIsSAattacked, b
 		}
 	}
 }
-
 
 void CClient::PenaltyItemDrop(int iTotal, bool bIsSAattacked , bool bItemDrop)
 {
@@ -1274,7 +1289,7 @@ void CClient::DecPKCount()
 {
 	if (m_iPKCount > 0) {
 		m_iPKCount--;
-		g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_PKPENALTY, NULL, NULL, NULL, NULL);
+		clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_PKPENALTY, NULL, NULL, NULL, NULL);
 		g_gameCopy->_bPKLog(PKLOG_REDUCECRIMINAL,(int) -1,m_handle,NULL);
 		if(m_iPKCount == 0)
 		{	
@@ -1290,15 +1305,8 @@ void CClient::IncPKCount()
 	m_iPKCount++;
 	SetStatusFlag(STATUS_PK, TRUE);
 
-	g_gameCopy->SendNotifyMsg(NULL, m_handle, NOTIFY_PKPENALTY, NULL, NULL, NULL, NULL);
+	clientEventSender->SendNotificationMessage(NULL, m_handle, NOTIFY_PKPENALTY, NULL, NULL, NULL, NULL);
 	g_gameCopy->SendEventToNearClient_TypeA(m_handle, OWNERTYPE_PLAYER, MSGID_EVENT_MOTION, OBJECTNULLACTION, NULL, NULL, NULL);
-}
-
-void CClient::Notify(int iFromH, WORD wMsgType, DWORD sV1, DWORD sV2, DWORD sV3, char * pString, 
-	DWORD sV4, DWORD sV5, DWORD sV6, DWORD sV7, DWORD sV8, DWORD sV9, char * pString2) const
-{
-	g_gameCopy->SendNotifyMsg(iFromH, this->m_handle, wMsgType, sV1, sV2, sV3, pString, 
-		sV4, sV5, sV6, sV7, sV8, sV9, pString2);
 }
 
 DWORD CClient::HasItem(char * name) const
@@ -1341,9 +1349,10 @@ float CClient::GetDropFactor() const
 		rep = 0;
 
 	float factor = 1 / ((3*log10((float)rep+10) + log10((float)m_iContribution+10)) / 5);
-	if(IsHeldWinner()) factor *= 0.75;
+	if (IsHeldWinner()) factor *= 0.75;
 	return factor;
 }
+
  bool CClient::IsHeldWinner() const
 {
 	switch(g_gameCopy->m_iLastHeldenianType)
@@ -1356,6 +1365,7 @@ float CClient::GetDropFactor() const
 	}
 	return FALSE;
 }
+
  bool CClient::IsHeldLoser() const
 {
 	switch(g_gameCopy->m_iLastHeldenianType)
@@ -1368,6 +1378,7 @@ float CClient::GetDropFactor() const
 	}
 	return FALSE;
 }
+
 bool CClient::CheckNearbyFlags()
 {
 	if (!g_gameCopy->m_bHeldenianMode || g_gameCopy->m_iHeldenianType != 1 ||

@@ -9140,11 +9140,6 @@ void CGame::DismissGuildApproveHandler(int iClientH, char * pName)
 
 			bSendMsgToLS(MSGID_REQUEST_UPDATEGUILDINFO_DELGUILDSMAN, i);
 
-#ifdef TAIWANLOG
-			_bItemLog(ITEMLOG_BANGUILD,i,(char *)NULL,NULL) ;
-#endif
-
-
 			SendGuildMsg(i, NOTIFY_DISMISSGUILDSMAN, NULL, NULL, NULL);
 
 			ZeroMemory(m_pClientList[i]->m_cGuildName, sizeof(m_pClientList[i]->m_cGuildName));
@@ -30842,6 +30837,7 @@ void CGame::CreateNewPartyHandler(int iClientH)
 	if (m_pClientList[iClientH] == NULL) return;
 
 	bFlag = m_pClientList[iClientH]->bCreateNewParty();
+
 	SendNotifyMsg(NULL, iClientH, NOTIFY_RESPONSE_CREATENEWPARTY, (int)bFlag, NULL, NULL, NULL);
 }
 
@@ -35104,7 +35100,7 @@ void CGame::GetExp(int iClientH, int iExp, bool bIsAttackerOwn)
 
 				for (i = 0; i < m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iTotalMembers; i++) {
 					iH = m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iIndex[i];
-					if ((m_pClientList[iH] != NULL) && (m_pClientList[iH]->m_iHP > 0))
+					if ((m_pClientList[iH] != NULL) && (m_pClientList[iH]->GetHP() > 0))
 					{
 						iPartyTotalMember++ ;
 					}

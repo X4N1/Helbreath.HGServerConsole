@@ -1913,6 +1913,5 @@ ClientEventSender::ClientEventSender()
 
 
 ClientEventSender::~ClientEventSender()
-{
-	delete(playerHelpers);
+{	
 }

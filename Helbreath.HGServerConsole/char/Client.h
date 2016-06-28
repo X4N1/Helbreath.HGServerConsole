@@ -18,6 +18,7 @@
 #include "GuildsMan.h"
 #include "Magic.h"
 #include "..\GlobalDef.h"
+#include "..\ClientEventSender.h"
 
 #define CLIENTSOCKETBLOCKLIMIT	15
 
@@ -38,12 +39,11 @@
 #define PARTYSTATUS_CONFIRM		2
 #define FLAGRANGE_X		20
 #define FLAGRANGE_Y		16
+
 class CClient sealed : public Unit
 {
 public:
-
 	bool bCreateNewParty();
-
 	CClient(HWND hWnd, int clientH);
 	~CClient();
 	bool CheckNearbyFlags();
@@ -98,9 +98,6 @@ public:
 	bool IsInvincible()	{ return (m_GMFlags & GMFLAG_INVENCIBLE)	? TRUE : FALSE; }
 	bool IsNoAggro()		{ return (m_GMFlags & GMFLAG_NOAGGRO)			? TRUE : FALSE; }
 
-	void Notify(int iFromH, WORD wMsgType, DWORD sV1, DWORD sV2, DWORD sV3, char * pString, 
-		DWORD sV4 = NULL, DWORD sV5 = NULL, DWORD sV6 = NULL, DWORD sV7 = NULL, DWORD sV8 = NULL, DWORD sV9 = NULL, 
-		char * pString2 = NULL) const;
 	uint32 HasItem(char * name) const;
 	uint32 HasItem(ItemID id) const;
 
@@ -111,6 +108,9 @@ public:
 	void SkillUp(skillIndexes index, int skillups);
 	int GetSSNToSkillUp(skillIndexes skillindex);
 	bool CanSkillUp(skillIndexes skillindex);
+
+	ClientEventSender *clientEventSender;
+
 	char m_cCharName[12];
 	char m_cAccountName[12];
 	char m_cAccountPassword[12];
@@ -359,6 +359,7 @@ public:
 		char cSide;
 		short sX, sY;
 	} m_stCrusadeStructureInfo[MAXCRUSADESTRUCTURES];
+
 	int m_iCSIsendPoint;
 
 	char m_cSendingMapName[12];
@@ -399,7 +400,7 @@ public:
 	bool  m_bIsRight;
 	char m_heroArmourBonus;
 
-private:
+private:	
 	int _str, _int, _dex, _mag, _vit;
 	int _angelStr, _angelInt, _angelDex, _angelMag, _angelVit;
 };

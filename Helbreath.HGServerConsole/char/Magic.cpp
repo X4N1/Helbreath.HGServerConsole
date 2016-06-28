@@ -38,7 +38,7 @@ void CMagic::Effect_RecSP(Unit * caster, Unit * target, uint32 dthrow, uint32 dr
 			if (player->m_iSP > iMaxSP) 
 				player->m_iSP = iMaxSP;
 
-			player->Notify(NULL, NOTIFY_SP, NULL, NULL, NULL, NULL);
+			player->clientEventSender->SendNotificationMessage(NULL, player->m_handle, NOTIFY_SP, NULL, NULL, NULL, NULL);
 		}
 	}
 }
