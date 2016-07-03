@@ -160,8 +160,8 @@ int BossDropConfiguration::GetTigerwormRareDrop()
 			itemId = 337; //RubyRing
 		}
 	}
-	else if ((diceResult > 7350) && (diceResult <= 7500))  itemId = 20;  // Excalibur
-	else if ((diceResult > 7500) && (diceResult <= 8750))  itemId = 290;  // Flameberge+3(LLF)
+	else if ((diceResult > 7350) && (diceResult <= 7380))  itemId = 20;  // Excalibur
+	else if ((diceResult > 7380) && (diceResult <= 8750))  itemId = 290;  // Flameberge+3(LLF)
 	else if ((diceResult > 8750) && (diceResult <= 9000))  itemId = 633;  // RingofDemonpower
 	else if ((diceResult > 9000) && (diceResult <= 9100))  itemId = 644;  // neck of air elemental
 	else if ((diceResult > 9101) && (diceResult <= 9249))  itemId = 642;  // neck of ice protection
