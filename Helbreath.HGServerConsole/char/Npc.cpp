@@ -260,6 +260,7 @@ bool CNpc::initNpcAttr(char * pNpcName, char cSA)
 int CNpc::GetMagicResistRatio() {
 	return m_cResistMagic;
 }
+
 bool CNpc::behavior_searchMaster()
 {
 	int ix, iy, rX, rY;

@@ -399,12 +399,16 @@ public:
 
 	bool  m_bIsRight;
 	char m_heroArmourBonus;
+	int GetExperianceLevelTreshold(int experiance);
 
 private:
 	int _str, _int, _dex, _mag, _vit;
 	int _angelStr, _angelInt, _angelDex, _angelMag, _angelVit;
-	int GetExperianceWhenInParty();
-	int GetExperianceWhenNotInParty();
+	void GiveExperianceEachMember(int clientId, int unitOfExperiance, int slateMulti);
+	
+	void GetExperianceWhenInParty(int experiance, bool bIsAttackerOwn, const PartyInfo &partyInfo);
+	int GetExperianceWhenNotInParty(int experiance);
+	int GetExperianceWhenAtMap(int experiance);
 };
 
 #endif // !defined(AFX_CLIENT_H__39CC7700_789F_11D2_A8E6_00001C7030A6__INCLUDED_)

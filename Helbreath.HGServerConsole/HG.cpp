@@ -9590,7 +9590,7 @@ bool CGame::_bDecodeNpcConfigFileContents(char * pData, DWORD dwMsgSize)
 					PutLogList("(!!!) CRITICAL ERROR! NPC configuration file error - Wrong Data format.");
 					delete[] pContents;
 					return FALSE;
-				}
+				}				
 				m_npcConfigList[iNpcConfigListIndex]->m_cResistMagic = atoi(token);
 				cReadModeB++;
 				break;
@@ -9675,7 +9675,7 @@ bool CGame::_bDecodeNpcConfigFileContents(char * pData, DWORD dwMsgSize)
 					PutLogList("(!!!) CRITICAL ERROR! NPC configuration file error - Wrong Data format.");
 					delete[] pContents;
 					return FALSE;
-				}
+				}				
 				m_npcConfigList[iNpcConfigListIndex]->m_iAbsDamage = atoi(token);
 
 				cReadModeB++;
@@ -35055,7 +35055,7 @@ void CGame::GetExp(int iClientH, int iExp, bool bIsAttackerOwn)
 		return;
 	}
 	else {
-		m_pClientList[iClientH]->GetExp(iExp, bIsAttackerOwn, m_stPartyInfo[1]);
+		m_pClientList[iClientH]->GetExp(iExp, bIsAttackerOwn, m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID]);
 	}
 }
 

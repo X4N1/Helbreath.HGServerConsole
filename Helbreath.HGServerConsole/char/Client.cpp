@@ -1408,6 +1408,8 @@ bool CClient::CheckNearbyFlags()
 
 void CClient::GetExp(int iExp, bool bIsAttackerOwn, const PartyInfo &partyInfo) {
 
+	printf("Get Exp method invoked %i \n", iExp);
+
 	double dV1, dV2, dV3;
 	double tempExp;
 	int i, iH, iUnitValue, iPartyTotalMember = 0, slateMulti = 1;
@@ -1416,6 +1418,48 @@ void CClient::GetExp(int iExp, bool bIsAttackerOwn, const PartyInfo &partyInfo) 
 	if (iExp <= 0) {
 		return;
 	}
+
+	if (this->GetHP() <= 0) {
+		return;
+	}
+
+	if ((this->m_iPartyID != NULL) && (this->m_iPartyStatus == PARTYSTATUS_CONFIRM) &&
+		((dwTime - this->m_dwLastActionTime) < 1000 * 60 * 5)) {	
+		
+		for (int i = 0; i < partyInfo.iTotalMembers; i++)
+		{
+			printf("Member ID %i \n", partyInfo.iIndex[i]);
+		}
+
+		this->GetExperianceWhenInParty(iExp, bIsAttackerOwn, partyInfo);
+	}
+	else
+	{
+		iExp = this->GetExperianceWhenNotInParty(iExp);
+		this->m_iExpStock += iExp;
+	}	
+}
+
+void CClient::GiveExperianceEachMember(int clientId, int unitOfExperiance, int slateMulti)
+{
+	printf("Giving exp member id %i \n", clientId);
+
+	int iUnitValue = unitOfExperiance;
+	int iH = clientId;
+
+	iUnitValue = g_clientList[iH]->GetExperianceLevelTreshold(iUnitValue);
+
+	if (g_clientList[iH]->m_iLevel == PLAYERMAXLEVEL) {
+		g_clientList[iH]->m_iExpStock += (iUnitValue / 3) * slateMulti;
+	}
+	else {
+		g_clientList[iH]->m_iExpStock += iUnitValue * slateMulti;
+	}
+}
+
+int CClient::GetExperianceLevelTreshold(int experiance)
+{
+	int iExp = experiance;
 
 	if (this->m_iLevel <= 100) {
 		iExp = iExp * 40;
@@ -1432,6 +1476,91 @@ void CClient::GetExp(int iExp, bool bIsAttackerOwn, const PartyInfo &partyInfo) 
 	else if (this->m_iLevel > 160 && this->m_iLevel <= 180) {
 		iExp = iExp * 5;
 	}
+
+	return iExp;
+}
+
+void CClient::GetExperianceWhenInParty(int experiance, bool bIsAttackerOwn, const PartyInfo &partyInfo)
+{
+	double dV1, dV2, dV3;
+	int iExp = experiance;
+	int i, iH, iUnitValue, iPartyTotalMember = 0, slateMulti = 1;	
+
+	if ((iExp >= 10) && (partyInfo.iTotalMembers > 1)) {
+		iPartyTotalMember = 0;
+
+		for (int i = 0; i < partyInfo.iTotalMembers; i++) {
+			iH = partyInfo.iIndex[i];
+			if ((g_clientList[iH] != NULL) && (g_clientList[iH]->m_iHP > 0))
+			{
+				iPartyTotalMember++;
+			}
+		}
+		if (iPartyTotalMember > MAXPARTYMEMBERS)
+		{
+			wsprintf(g_cTxt, "(X) Party Bug !! partyMember %d XXXXXXXXXX", iPartyTotalMember);
+			PutLogFileList(g_cTxt);
+			iPartyTotalMember = MAXPARTYMEMBERS;
+		}
+
+		dV1 = (double)iExp;
+
+		if (iPartyTotalMember == 1) {
+			dV2 = dV1;
+		}
+		else {
+			dV2 = (dV1 * ((log((float)(iPartyTotalMember + 2) * 9) / 9) + 0.65)) / iPartyTotalMember;
+		}		
+
+		dV3 = dV2 + 0.5f;
+		iUnitValue = (int)dV3;		
+
+		for (i = 0; i < partyInfo.iTotalMembers; i++, slateMulti = 1) {
+			iH = partyInfo.iIndex[i];
+			if ((g_clientList[iH] != NULL) && (g_clientList[iH]->m_iHP > 0)) {
+				if ((g_clientList[iH]->m_iStatus & STATUS_GREENSLATE) != 0) {
+					slateMulti = 2;
+				}
+				this->GiveExperianceEachMember(iH, iUnitValue, slateMulti);
+			}
+		}
+		if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
+			iUnitValue *= 2;
+		}
+		if (this->m_iLevel == PLAYERMAXLEVEL) {
+			iUnitValue /= 3;
+		}
+		if ((bIsAttackerOwn == TRUE) && (iPartyTotalMember > 1)) {
+			this->m_iExpStock += (int)(iUnitValue / 10);
+		}
+	}
+	else
+	{
+		this->GetExperianceWhenNotInParty(iExp);
+	}
+}
+
+int CClient::GetExperianceWhenNotInParty(int experiance)
+{
+	int iExp = experiance;
+
+	iExp = this->GetExperianceLevelTreshold(iExp);
+	iExp = this->GetExperianceWhenAtMap(iExp);
+
+	if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
+		iExp *= 2;
+	}
+	if (this->m_iLevel == PLAYERMAXLEVEL) {
+		iExp /= 3;
+	}
+
+	return iExp;
+}
+
+int CClient::GetExperianceWhenAtMap(int experiance)
+{
+	int iExp = experiance;
+	double dV1, dV2, dV3;
 
 	if (this->m_iLevel <= 80) {
 		dV1 = (double)(80 - this->m_iLevel);
@@ -1451,115 +1580,5 @@ void CClient::GetExp(int iExp, bool bIsAttackerOwn, const PartyInfo &partyInfo) 
 		}
 	}
 
-	if ((this->m_iPartyID != NULL) && (this->m_iPartyStatus == PARTYSTATUS_CONFIRM) &&
-		((dwTime - this->m_dwLastActionTime) < 1000 * 60 * 5)) {
-		if ((iExp >= 10) && (partyInfo.iTotalMembers > 1)) {
-			iPartyTotalMember = 0;
-
-			for (i = 0; i < partyInfo.iTotalMembers; i++) {
-				iH = partyInfo.iIndex[i];
-				if ((g_clientList[iH] != NULL) && (g_clientList[iH]->m_iHP > 0))
-				{
-					iPartyTotalMember++;
-				}
-			}
-			if (iPartyTotalMember > MAXPARTYMEMBERS)
-			{
-				wsprintf(g_cTxt, "(X) Party Bug !! partyMember %d XXXXXXXXXX", iPartyTotalMember);
-				PutLogFileList(g_cTxt);
-				iPartyTotalMember = MAXPARTYMEMBERS;
-			}
-
-			dV1 = (double)iExp;
-
-
-			if (iPartyTotalMember == 1)	dV2 = dV1;
-			else dV2 = (dV1 * ((log((float)(iPartyTotalMember + 2) * 9) / 9) + 0.65)) / iPartyTotalMember;
-
-			/*switch(iPartyTotalMember)
-			{
-			case 1:  dV2 = dV1 ;  break ;
-			case 2:  dV2 = (dV1 + (dV1 * 0.02))  / 2 ; break ;
-			case 3:  dV2 = (dV1 + (dV1 * 0.05)) / 3 ; break ;
-			case 4:  dV2 = (dV1 + (dV1 * 0.07)) / 4 ; break ;
-			case 5:  dV2 = (dV1 + (dV1 * 0.1))  / 5 ; break ;
-			case 6:  dV2 = (dV1 + (dV1 * 0.14)) / 6 ; break ;
-			case 7:  dV2 = (dV1 + (dV1 * 0.17)) / 7 ; break ;
-			case 8:  dV2 = (dV1 + (dV1 * 0.2))  / 8 ; break ;
-			default: dV2 = dV1 ;  break ;
-			}*/
-
-			dV3 = dV2 + 0.5f;
-			iUnitValue = (int)dV3;
-
-			/*
-			dV1 = (double)m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iTotalMembers;
-			dV2 = 2.5f * dV1;
-			dV3 = (double)iExp;
-			dV1 = ((dV2/100.0f) * dV3) +0.5f;
-			iExp += (int)dV1;
-
-			dV1 = (double)iExp;
-			if (m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iTotalMembers <= 0)
-			dV2 = 1.0f;
-			else dV2 = (double)m_stPartyInfo[m_pClientList[iClientH]->m_iPartyID].iTotalMembers;
-			dV3 = (dV1 / dV2) + 0.5f;
-			iUnitValue = (int)dV3; */
-
-			for (i = 0; i < partyInfo.iTotalMembers; i++, slateMulti = 1) {
-				iH = partyInfo.iIndex[i];
-				if ((g_clientList[iH] != NULL) && (g_clientList[iH]->m_iHP > 0)) {
-					if ((g_clientList[iH]->m_iStatus & STATUS_GREENSLATE) != 0) {
-						slateMulti = 2;
-					}
-					if (g_clientList[iH]->m_iLevel == PLAYERMAXLEVEL) {
-						g_clientList[iH]->m_iExpStock += (iUnitValue / 3) * slateMulti;
-					}
-					else {
-						g_clientList[iH]->m_iExpStock += iUnitValue * slateMulti;
-					}
-				}
-			}
-			if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
-				iUnitValue *= 2;
-			}
-			if (this->m_iLevel == PLAYERMAXLEVEL) {
-				iUnitValue /= 3;
-			}
-			if ((bIsAttackerOwn == TRUE) && (iPartyTotalMember > 1)) {
-				this->m_iExpStock += (int)(iUnitValue / 10);
-			}
-
-		}
-		else
-		{
-			if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
-				iExp *= 2;
-			}
-			if (this->m_iLevel == PLAYERMAXLEVEL) {
-				iExp /= 3;
-			}
-			this->m_iExpStock += iExp;
-		}
-	}
-	else
-	{
-		if ((this->m_iStatus & STATUS_GREENSLATE) != 0) {
-			iExp *= 2;
-		}
-		if (this->m_iLevel == PLAYERMAXLEVEL) {
-			iExp /= 3;
-		}
-		this->m_iExpStock += iExp;
-	}
-}
-
-int CClient::GetExperianceWhenInParty()
-{
-	return 0;
-}
-
-int CClient::GetExperianceWhenNotInParty()
-{
-	return 0;
+	return iExp;
 }
