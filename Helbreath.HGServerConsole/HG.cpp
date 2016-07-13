@@ -5731,6 +5731,9 @@ void CGame::ChatMsgHandler(int iClientH, char * pData, DWORD dwMsgSize)
 		if (memcmp(cp, "/who", 4) == 0) {
 			SendNotifyMsg(NULL, iClientH, NOTIFY_TOTALUSERS, m_iTotalGameServerClients, NULL, NULL, NULL);
 		}
+		else if (memcmp(cp, "/hellclawevent", 14) == 0) {
+			Admin_HellclawEvent(iClientH);
+		}
 		else if (memcmp(cp, "/revive", 7) == 0) {
 			AdminOrder_Revive(iClientH, cp, dwMsgSize - 21);
 			return;
@@ -18054,6 +18057,17 @@ void CGame::UseItemHandler(int iClientH, short sItemIndex, short dX, short dY, s
 			}
 		}
 	}
+}
+
+void CGame::Admin_HellclawEvent(int iClientH)
+{
+	if (m_pClientList[iClientH]->m_iAdminUserLevel < 4) {
+		SendNotifyMsg(NULL, iClientH, NOTIFY_ADMINUSERLEVELLOW, NULL, NULL, NULL, NULL);
+		return;
+	}
+	HellclawEvent *hellclawEvent = new HellclawEvent();
+	hellclawEvent->Start();
+	delete hellclawEvent;
 }
 
 
@@ -34169,7 +34183,11 @@ void CGame::Scheduler()
 	{
 		if (m_schedules[i] == SysTime)
 		{
-			m_schedules[i].evStatus = ES_STARTED;
+			printf("Check for time \n");
+			if (m_schedules[i].evStatus == ES_STARTED) {
+				return;
+			}
+
 			switch(m_schedules[i].evType)
 			{
 			case ET_CAPTURE:
@@ -34178,6 +34196,13 @@ void CGame::Scheduler()
 				break;
 			case ET_CRUSADE:
 				GlobalStartCrusadeMode();
+				break;
+			case ET_HELLCLAW_SUMMON_ML:
+				printf("ET_HELLCLAW_SUMMON_ML event \n");
+				m_schedules[i].evStatus = ES_STARTED;
+				HellclawEvent *hellclawEvent = new HellclawEvent();
+				hellclawEvent->Start();
+				delete hellclawEvent;
 				break;
 			}
 		}
@@ -34263,16 +34288,20 @@ bool CGame::bReadSchedulerConfigFile(char *pFn)
 							PutLogList("(!) WARNING! Too many events in scheduler!"); 
 							return TRUE;
 						}
-						if(memcmp(token, "CTR", 3) == 0)
-						{
+						if(memcmp(token, "CTR", 3) == 0){
 							m_schedules[m_schedulesCnt].evType = ET_CAPTURE;
-						}else if(memcmp(token, "DS", 2) == 0)
-						{
+						}
+						else if(memcmp(token, "DS", 2) == 0){
 							m_schedules[m_schedulesCnt].evType = ET_DESTROY_SHIELD;
-						}else if(memcmp(token, "Crusade", 7) == 0)
-						{
+						}
+						else if(memcmp(token, "Crusade", 7) == 0){
 							m_schedules[m_schedulesCnt].evType = ET_CRUSADE;
-						}else
+						}
+						else if (memcmp(token, "hcml", 4) == 0) {
+							printf("Setup HC on ML event \n");
+							m_schedules[m_schedulesCnt].evType = ET_HELLCLAW_SUMMON_ML;
+						}
+						else
 						{
 							cReadModeA = 0;
 							cReadModeB = 0;

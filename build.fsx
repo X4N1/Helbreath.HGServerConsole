@@ -5,11 +5,14 @@ open Fake
 
 // Properties
 let buildDir = "./build"
+let releaseDir = "./release"
+let debugVSDir = "./Helbreath.HGServerConsole/Debug"
+let releaseVSDir = "./Helbreath.HGServerConsole/Release"
 
 // Targets
 Target "Clean" (fun _ ->
 trace "--- Cleaning build and test dirs --- "
-CleanDirs [buildDir]
+CleanDirs [buildDir; releaseDir; debugVSDir; releaseVSDir]
 )
 
 Target "CopyToDebugFolder" (fun _ ->

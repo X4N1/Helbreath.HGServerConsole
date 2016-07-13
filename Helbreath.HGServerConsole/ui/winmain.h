@@ -11,7 +11,7 @@ void Assertion(const char * assertion, const char * file, const uint32 line);
 #define ASSERT(assertion) { if( !(assertion) ) { Assertion(#assertion, __FILE__, __LINE__); assert( assertion &&0); } }
 
 void OnAccept();
-void UpdateScreen();
+void UpdateScreen();	
 void OnPaint();
 void OnDestroy();
 void CALLBACK _TimerFunc(UINT wID, UINT wUser, DWORD dwUSer, DWORD dw1, DWORD dw2);

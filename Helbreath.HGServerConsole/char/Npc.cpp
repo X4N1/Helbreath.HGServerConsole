@@ -1106,7 +1106,6 @@ bool CNpc::behavior_manaCollector()
 	return bRet;
 }
 
-
 void CNpc::behavior_grandMagicGenerator()
 {
 	if(IsNeutral()) return;
@@ -1117,8 +1116,6 @@ void CNpc::behavior_grandMagicGenerator()
 		g_gameCopy->m_mana[m_side] = 0;
 	}
 }
-
-
 
 bool CNpc::behavior_detector()
 {

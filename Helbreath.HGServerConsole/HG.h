@@ -60,6 +60,7 @@
 #include "ClientEventSender.h"
 #include "BossDropConfiguration.h"
 #include "NormalDropConfiguration.h"
+#include "HellclawEvent.h"
 
 #define SERVERSOCKETBLOCKLIMIT	300
 
@@ -537,6 +538,8 @@ public:
 	void Effect_HpUp_Spot(short sAttackerH, char cAttackerType, short sTargetH, char cTargetType, short sV1, short sV2, short sV3);
 	void Effect_Damage_Spot(short sAttackerH, char cAttackerType, short sTargetH, char cTargetType, short sV1, short sV2, short sV3, bool bExp, int iAttr = NULL);
 	void UseItemHandler(int iClientH, short sItemIndex, short dX, short dY, short sDestItemID);
+
+	void Admin_HellclawEvent(int iClientH);
 
 	void ItemDepleteHandler(int iClientH, short sItemIndex, bool bIsUseItemResult, bool bIsLog = TRUE);
 	int _iGetArrowItemIndex(int iClientH);

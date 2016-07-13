@@ -104,6 +104,7 @@
     <ClCompile Include="ClientEventSender.cpp" />
     <ClCompile Include="DelayedEvents.cpp" />
     <ClCompile Include="DropConfig.cpp" />
+    <ClCompile Include="HellclawEvent.cpp" />
     <ClCompile Include="HG.cpp" />
     <ClCompile Include="Ini.cpp" />
     <ClCompile Include="main.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="DropConfig.h" />
     <ClInclude Include="englishitem.h" />
     <ClInclude Include="GlobalDef.h" />
+    <ClInclude Include="HellclawEvent.h" />
     <ClInclude Include="HG.h" />
     <ClInclude Include="Ini.h" />
     <ClInclude Include="map\DynamicObject.h" />
